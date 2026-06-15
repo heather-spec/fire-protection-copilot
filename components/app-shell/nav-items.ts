@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Inbox,
   Building2,
   MapPin,
   ClipboardList,
@@ -17,6 +18,7 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   { href: "/dashboard",     label: "Dashboard",    icon: LayoutDashboard },
+  { href: "/desk",          label: "Dawn's Desk",  icon: Inbox },
   { href: "/customers",     label: "Customers",    icon: Building2 },
   { href: "/sites",         label: "Sites",        icon: MapPin },
   { href: "/work-records",  label: "Work records", icon: ClipboardList },
