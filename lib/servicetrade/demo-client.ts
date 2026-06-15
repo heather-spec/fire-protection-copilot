@@ -71,7 +71,10 @@ export async function filePacket(
 
   const form = new FormData();
   // ServiceTrade requires the file field to be named exactly "uploadedFile".
-  form.append("uploadedFile", new Blob([pdfBytes], { type: "application/pdf" }), filename);
+  // Cast for the TS 5.7 typed-array generic (Uint8Array<ArrayBufferLike> vs BlobPart);
+  // valid at runtime in both Node and the browser.
+  const part = pdfBytes as unknown as BlobPart;
+  form.append("uploadedFile", new Blob([part], { type: "application/pdf" }), filename);
   form.append("entityId", creds.jobId);
   form.append("entityType", "3"); // 3 = Job
   form.append("purposeId", "1"); // 1 = Job Paperwork

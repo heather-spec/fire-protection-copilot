@@ -79,7 +79,7 @@ export async function bounceBack(id: string): Promise<void> {
   } catch (e) {
     note = `Please complete the missing readings: ${missing.map((m) => m.field).join(", ")}.`;
   }
-  updateDeskState(id, { stage: "review", bounceNote: note });
+  updateDeskState(id, { stage: "review", bounceNote: note, error: null });
   revalidate(id);
 }
 
