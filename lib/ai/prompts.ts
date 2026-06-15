@@ -194,3 +194,83 @@ export function safeParseDeficiencyJson(raw: string): DeficiencyExtraction[] {
     return [];
   }
 }
+
+/* -------------------------------------------------------------------- */
+/* Desk demo: PDF completeness + bounce-back note                       */
+/* -------------------------------------------------------------------- */
+
+export interface PdfCompletenessInputs {
+  formName: string;
+  requiredFields: string[];
+  /** field name -> extracted value ("" means blank on the report) */
+  reportFields: Record<string, string>;
+}
+
+export function pdfCompletenessPrompt(inp: PdfCompletenessInputs) {
+  const fieldDump = Object.entries(inp.reportFields)
+    .map(([k, v]) => `- ${k}: ${v.trim() === "" ? "(blank)" : v.trim()}`)
+    .join("\n");
+  const userPrompt = [
+    `You are reviewing a completed "${inp.formName}" fire-protection inspection report.`,
+    `These readings are REQUIRED for this report to be complete:`,
+    inp.requiredFields.map((f) => `- ${f}`).join("\n"),
+    ``,
+    `Here is every field captured on the report and its value:`,
+    fieldDump || "(no extractable fields)",
+    ``,
+    `Decide which REQUIRED readings are missing or blank. Match required readings`,
+    `to report fields by meaning, not exact string (e.g. "Suction Pressure" may`,
+    `appear as "Suction PSI"). A field present but blank counts as missing.`,
+    ``,
+    `Output STRICT JSON only, no prose, this exact shape:`,
+    `{ "missing": [ { "field": string, "reason": string } ], "satisfied_count": number }`,
+    `where satisfied_count is how many of the ${inp.requiredFields.length} required`,
+    `readings are present and non-blank. If everything is present, "missing" is [].`,
+  ].join("\n");
+  const systemPrompt =
+    "You are a meticulous fire-protection report reviewer. Report only what the " +
+    "data shows. Never invent values or NFPA codes. Output JSON only.";
+  return { systemPrompt, userPrompt };
+}
+
+export interface BounceNoteInputs {
+  formName: string;
+  customer: string;
+  missing: Array<{ field: string; reason: string }>;
+}
+
+export function bounceNotePrompt(inp: BounceNoteInputs) {
+  const userPrompt = [
+    `Write a short, friendly note to the field technician asking them to complete`,
+    `their "${inp.formName}" report for ${inp.customer}. List exactly what is missing:`,
+    inp.missing.map((m) => `- ${m.field}`).join("\n"),
+    ``,
+    `Two or three sentences. Specific, not preachy. No greeting block, no signature.`,
+  ].join("\n");
+  const systemPrompt =
+    "You write brief, plain, respectful internal messages for a fire-protection " +
+    "contractor's back office. No marketing tone.";
+  return { systemPrompt, userPrompt };
+}
+
+export function safeParseCompletenessJson(
+  raw: string,
+): { missing: Array<{ field: string; reason: string }>; satisfied_count: number } | null {
+  const cleaned = raw.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (!parsed || !Array.isArray(parsed.missing)) return null;
+    const missing = parsed.missing
+      .filter((m: unknown): m is { field: string; reason: string } =>
+        !!m && typeof (m as { field?: unknown }).field === "string")
+      .map((m: { field: string; reason?: string }) => ({
+        field: m.field,
+        reason: typeof m.reason === "string" ? m.reason : "",
+      }));
+    const satisfied_count =
+      typeof parsed.satisfied_count === "number" ? parsed.satisfied_count : 0;
+    return { missing, satisfied_count };
+  } catch {
+    return null;
+  }
+}
