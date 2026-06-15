@@ -41,9 +41,12 @@ export const mockProvider: AiProvider = {
     parts.push("DRAFT — generated from technician inputs. Reviewer must verify before finalizing.\n");
 
     if (facts["Visit type"] && facts["Site"] && facts["Customer"]) {
+      const jurisdictionTail = facts["Jurisdiction"]
+        ? ` (AHJ: ${facts["Jurisdiction"]}${facts["Adopted code"] ? `; ${facts["Adopted code"]}` : ""})`
+        : "";
       parts.push(
         `A ${facts["Visit type"].toLowerCase()} visit was performed at ${facts["Site"]} ` +
-          `(${facts["Customer"]})` +
+          `(${facts["Customer"]})${jurisdictionTail}` +
           (facts["Completed"] ? ` on ${facts["Completed"]}.` : "."),
       );
     }
@@ -71,6 +74,16 @@ export const mockProvider: AiProvider = {
       for (const f of failed) parts.push(`• ${f}`);
     } else if (observations.length > 0) {
       parts.push("\nNo failing items were recorded; corrective actions should be reviewed against AHJ requirements.");
+    }
+
+    // If the source block listed jurisdiction amendments, surface a reminder.
+    // We don't try to MATCH them to specific observations — that's the real
+    // model's job. We just nudge the reviewer to check.
+    if (lines.some((l) => l.startsWith("- NFPA") && l.includes("→"))) {
+      parts.push(
+        "\nLocal code amendments may apply for this jurisdiction (see source inputs). " +
+          "Reviewer should verify each NFPA citation against the adopted local code reference.",
+      );
     }
 
     parts.push(

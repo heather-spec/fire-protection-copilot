@@ -1,0 +1,70 @@
+{
+  "version": "1",
+  "generated_at": "2026-06-10",
+  "forms": [
+    {
+      "form_id": "annual_inspection_v1",
+      "source_pdf": "annual inspection report.pdf",
+      "page_count": 2,
+      "field_count": 71,
+      "servicetrade_field_count": 8,
+      "json_path": "annual_inspection_v1.json"
+    },
+    {
+      "form_id": "annual_inspection_legacy",
+      "source_pdf": "Inspection Report .pdf",
+      "page_count": 2,
+      "field_count": 71,
+      "servicetrade_field_count": 0,
+      "json_path": "annual_inspection_legacy.json"
+    },
+    {
+      "form_id": "annual_inspection_alt5",
+      "source_pdf": "RTF_Inspection_Form_Alt_5.pdf",
+      "page_count": 2,
+      "field_count": 70,
+      "servicetrade_field_count": 0,
+      "json_path": "annual_inspection_alt5.json"
+    },
+    {
+      "form_id": "riser_v1",
+      "source_pdf": "riser form.pdf",
+      "page_count": 1,
+      "field_count": 23,
+      "servicetrade_field_count": 8,
+      "json_path": "riser_v1.json"
+    },
+    {
+      "form_id": "fire_pump_v1",
+      "source_pdf": "fire pump.pdf",
+      "page_count": 1,
+      "field_count": 62,
+      "servicetrade_field_count": 8,
+      "json_path": "fire_pump_v1.json"
+    },
+    {
+      "form_id": "fire_hydrant_v1",
+      "source_pdf": "fire hydrant.pdf",
+      "page_count": 1,
+      "field_count": 68,
+      "servicetrade_field_count": 8,
+      "json_path": "fire_hydrant_v1.json"
+    },
+    {
+      "form_id": "backflow_v1",
+      "source_pdf": "backflow report.pdf",
+      "page_count": 1,
+      "field_count": 27,
+      "servicetrade_field_count": 8,
+      "json_path": "backflow.json"
+    },
+    {
+      "form_id": "combined_customer_v1",
+      "source_pdf": "total inspection combined report.pdf",
+      "page_count": 7,
+      "field_count": 0,
+      "servicetrade_field_count": 0,
+      "json_path": "combined_customer_v1.json"
+    }
+  ]
+}

@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test": "node --test --import tsx lib/validation/checker.test.ts",
+    "templates:load": "node scripts/load-inspection-templates.mjs",
+    "seed:ryder": "node scripts/seed-ryder.mjs",
+    "pdf:build": "node scripts/build-pdf-templates.mjs",
+    "st:push": "node scripts/push-to-servicetrade.mjs",
     "db:reset": "supabase db reset",
     "db:diff": "supabase db diff",
     "db:push": "supabase db push",
@@ -21,6 +26,7 @@
     "date-fns": "^3.6.0",
     "lucide-react": "^0.451.0",
     "next": "14.2.15",
+    "pdf-lib": "^1.17.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.4",
@@ -36,6 +42,7 @@
     "eslint-config-next": "14.2.15",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
 }

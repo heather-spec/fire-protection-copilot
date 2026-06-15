@@ -1,0 +1,50 @@
+{
+  "form_id": "combined_customer_v1",
+  "form_name": "Combined Customer Inspection Report",
+  "nfpa_standard": null,
+  "rtf_form_version": null,
+  "page_count": 7,
+  "source_pdf": "total inspection combined report.pdf",
+  "powerpoint_source": false,
+
+  "sections": [
+    {
+      "kind": "cover",
+      "title": "Inspection Report Summary",
+      "from_form_id": null,
+      "notes": "Cover sheet with site name, inspection date, deliverable summary. Built by Agent C's combined wrapper, not embedded from another form."
+    },
+    {
+      "kind": "embed",
+      "title": "Annual Inspection",
+      "from_form_id": "annual_inspection_v1",
+      "notes": "Renders the 2-page annual inspection report. Falls back to annual_inspection_legacy or annual_inspection_alt5 depending on source intake."
+    },
+    {
+      "kind": "embed",
+      "title": "Risers",
+      "from_form_id": "riser_v1",
+      "notes": "Renders the per-system riser table. One page when 15 systems or fewer."
+    },
+    {
+      "kind": "embed",
+      "title": "Fire Pump",
+      "from_form_id": "fire_pump_v1",
+      "notes": "Renders fire pump + jockey pump + driver + controller + flow test grid."
+    },
+    {
+      "kind": "embed",
+      "title": "Fire Hydrants",
+      "from_form_id": "fire_hydrant_v1",
+      "notes": "Renders the 12-slot hydrant inventory table with operated/lubricated/drained columns."
+    },
+    {
+      "kind": "embed",
+      "title": "Backflow",
+      "from_form_id": "backflow_v1",
+      "notes": "Renders one backflow page per device tested at the site (Ryder has 2)."
+    }
+  ],
+
+  "fields": []
+}

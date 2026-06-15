@@ -1,9 +1,13 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDemoIdentity } from "@/lib/demo/identity";
 import type {
   Asset,
+  CodeAmendment,
   Customer,
   Deficiency,
   DeficiencyUpdate,
+  InspectionTemplate,
+  Jurisdiction,
   Membership,
   Organization,
   Profile,
@@ -13,6 +17,7 @@ import type {
   UserRole,
   WorkRecord,
   WorkRecordObservation,
+  WorkRecordReading,
 } from "@/lib/db/types";
 
 /**
@@ -23,23 +28,20 @@ import type {
  * to keep queries fast and explicit.
  */
 
+// ---------- DEMO MODE — auth is disabled ----------
+// These functions return the demo identity defined in lib/demo/identity.ts.
+// The "role" comes from the demo_role cookie (admin/reviewer/technician)
+// and updates instantly when the topbar role switcher sets it.
+
 export async function getCurrentUser() {
-  const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-  return data.user;
+  const { user } = await getDemoIdentity();
+  // Shape-compatible enough with supabase.auth.User for our usage
+  return { id: user.id, email: user.email } as { id: string; email: string };
 }
 
 export async function getCurrentProfile(): Promise<Profile | null> {
-  const supabase = createSupabaseServerClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return null;
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", auth.user.id)
-    .maybeSingle();
-  return data ?? null;
+  const { profile } = await getDemoIdentity();
+  return profile;
 }
 
 export interface MembershipWithOrg extends Membership {
@@ -47,26 +49,25 @@ export interface MembershipWithOrg extends Membership {
 }
 
 export async function getMyMemberships(): Promise<MembershipWithOrg[]> {
-  const supabase = createSupabaseServerClient();
-  const { data } = await supabase
-    .from("memberships")
-    .select("*, organization:organizations(*)")
-    .order("created_at", { ascending: true });
-  return (data ?? []) as MembershipWithOrg[];
+  const { org, user, role } = await getDemoIdentity();
+  return [
+    {
+      id: `demo-${role}`,
+      org_id: org.id,
+      profile_id: user.id,
+      role,
+      created_at: new Date().toISOString(),
+      organization: org,
+    },
+  ];
 }
 
-/**
- * Resolve the active organization. MVP rule: first membership wins;
- * later replaced by a cookie-pinned org switcher.
- */
 export async function getActiveOrg(): Promise<{
   org: Organization;
   role: UserRole;
 } | null> {
-  const memberships = await getMyMemberships();
-  if (memberships.length === 0) return null;
-  const first = memberships[0];
-  return { org: first.organization, role: first.role };
+  const { org, role } = await getDemoIdentity();
+  return { org, role };
 }
 
 // ---------- list queries ----------
@@ -223,15 +224,90 @@ export async function listSitesForCustomer(orgId: string, customerId: string): P
   return data ?? [];
 }
 
-export async function getSite(orgId: string, id: string): Promise<(Site & { customer: Customer | null }) | null> {
+export async function getSite(
+  orgId: string,
+  id: string,
+): Promise<
+  | (Site & { customer: Customer | null; jurisdiction: Jurisdiction | null })
+  | null
+> {
   const supabase = createSupabaseServerClient();
   const { data } = await supabase
     .from("sites")
-    .select("*, customer:customers(*)")
+    .select("*, customer:customers(*), jurisdiction:jurisdictions(*)")
     .eq("org_id", orgId)
     .eq("id", id)
     .maybeSingle();
-  return (data as (Site & { customer: Customer | null }) | null) ?? null;
+  return (data as (Site & { customer: Customer | null; jurisdiction: Jurisdiction | null }) | null) ?? null;
+}
+
+// ---------- jurisdictions (reference data, global) ----------
+
+export async function listJurisdictions(): Promise<Jurisdiction[]> {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("jurisdictions")
+    .select("*")
+    .order("state")
+    .order("jurisdiction_type", { ascending: false }) // state, then city
+    .order("name");
+  return (data ?? []) as Jurisdiction[];
+}
+
+export async function getJurisdiction(id: string): Promise<Jurisdiction | null> {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase.from("jurisdictions").select("*").eq("id", id).maybeSingle();
+  return (data ?? null) as Jurisdiction | null;
+}
+
+export async function listAmendmentsForJurisdiction(
+  jurisdictionId: string,
+): Promise<CodeAmendment[]> {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("code_amendments")
+    .select("*")
+    .eq("jurisdiction_id", jurisdictionId)
+    .order("source_ref");
+  return (data ?? []) as CodeAmendment[];
+}
+
+/**
+ * For a given source NFPA reference (e.g. "NFPA 25 8.3.2.4") return the
+ * local citation for the site's jurisdiction, if any. Walks up parent_id
+ * so a city AHJ inherits its state's amendments unless overridden.
+ */
+export async function resolveLocalCitation(
+  jurisdictionId: string | null,
+  sourceRef: string,
+): Promise<{ localRef: string | null; frequencyOverride: string | null }> {
+  if (!jurisdictionId) return { localRef: null, frequencyOverride: null };
+  const supabase = createSupabaseServerClient();
+
+  // build the chain: current jurisdiction → parent → grandparent…
+  const ids: string[] = [];
+  let nextId: string | null = jurisdictionId;
+  for (let i = 0; nextId && i < 5; i++) {
+    const here: string = nextId;
+    ids.push(here);
+    const lookup: { data: { parent_id: string | null } | null } =
+      await supabase.from("jurisdictions").select("parent_id").eq("id", here).maybeSingle();
+    nextId = lookup.data?.parent_id ?? null;
+  }
+
+  const { data: amendments } = await supabase
+    .from("code_amendments")
+    .select("*")
+    .in("jurisdiction_id", ids)
+    .eq("source_ref", sourceRef);
+
+  const rows = (amendments ?? []) as Array<CodeAmendment>;
+  // Prefer the most-specific (lowest in the chain — earliest in ids[]).
+  for (const id of ids) {
+    const hit = rows.find((a) => a.jurisdiction_id === id);
+    if (hit) return { localRef: hit.local_ref, frequencyOverride: hit.frequency_override };
+  }
+  return { localRef: null, frequencyOverride: null };
 }
 
 export async function listSiteContacts(orgId: string, siteId: string): Promise<SiteContact[]> {
@@ -378,4 +454,91 @@ export async function listOrgMembers(orgId: string): Promise<OrgMember[]> {
     role: m.role,
     profile: m.profile,
   }));
+}
+
+// ---------- inspection templates (migration 0005) ----------
+
+/**
+ * All active inspection_templates rows. Global reference data — no org
+ * filter. The full JSON schema lives in schema_json on each row.
+ */
+export async function listInspectionTemplates(): Promise<InspectionTemplate[]> {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("inspection_templates")
+    .select("*")
+    .eq("is_active", true)
+    .order("form_name");
+  return (data ?? []) as InspectionTemplate[];
+}
+
+/**
+ * Fetch one template by form_id (e.g. "backflow_v1"). Returns null if no
+ * row exists, which is the contract callers expect when the form_id is
+ * unknown or not yet seeded.
+ */
+export async function getInspectionTemplate(
+  formId: string,
+): Promise<InspectionTemplate | null> {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("inspection_templates")
+    .select("*")
+    .eq("form_id", formId)
+    .maybeSingle();
+  return (data as InspectionTemplate | null) ?? null;
+}
+
+/**
+ * All numeric readings captured for a work record (PSI, GPM, RPM, etc.).
+ * Returned in capture order so the print template and completeness
+ * checker walk readings the same way the inspector wrote them.
+ */
+export async function listReadingsForRecord(
+  workRecordId: string,
+): Promise<WorkRecordReading[]> {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("work_record_readings")
+    .select("*")
+    .eq("work_record_id", workRecordId)
+    .order("created_at", { ascending: true });
+  return (data ?? []) as WorkRecordReading[];
+}
+
+// ---------- name-bridging adapters for the print dispatcher (Agent C) ----------
+// Agent C's print page imports `getInspectionTemplateForRecord`,
+// `listWorkRecordReadings`, and `listAssetsForWorkRecord`. Agent B published
+// these as `getInspectionTemplate`/`listReadingsForRecord`/`listAssetsForSite`.
+// Rather than rewrite either side, the orchestrator publishes the missing
+// adapter names here.
+
+export async function getInspectionTemplateForRecord(
+  record: { template_form_id: string | null },
+): Promise<InspectionTemplate | null> {
+  if (!record.template_form_id) return null;
+  return getInspectionTemplate(record.template_form_id);
+}
+
+export const listWorkRecordReadings = listReadingsForRecord;
+
+/**
+ * The print page wants assets for a given work record. We look up the
+ * record's site_id and return that site's assets. (When per-record asset
+ * pinning lands later, this query gets narrower.)
+ */
+export async function listAssetsForWorkRecord(
+  orgId: string,
+  workRecordId: string,
+): Promise<Asset[]> {
+  const supabase = createSupabaseServerClient();
+  const { data: rec } = await supabase
+    .from("work_records")
+    .select("site_id")
+    .eq("id", workRecordId)
+    .eq("org_id", orgId)
+    .maybeSingle();
+  const siteId = (rec as { site_id: string } | null)?.site_id;
+  if (!siteId) return [];
+  return listAssetsForSite(orgId, siteId);
 }

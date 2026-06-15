@@ -21,11 +21,16 @@ import { Badge } from "@/components/ui/badge";
 import { WorkStatusBadge } from "@/components/dashboard/status-pill";
 import {
   getActiveOrg,
+  getInspectionTemplate,
+  getJurisdiction,
   getWorkRecord,
   listAssetsForSite,
   listObservations,
+  listReadingsForRecord,
   listReportVersions,
 } from "@/lib/db/queries";
+import { checkCompleteness } from "@/lib/validation/checker";
+import { CompletenessPanel } from "@/components/reviewer/completeness-panel";
 import {
   addObservationAction,
   approveWorkRecordAction,
@@ -48,11 +53,31 @@ export default async function WorkRecordDetailPage({ params }: { params: { id: s
   const record = await getWorkRecord(active.org.id, params.id);
   if (!record) notFound();
 
-  const [observations, versions, assets] = await Promise.all([
+  const [observations, versions, assets, readings] = await Promise.all([
     listObservations(record.id),
     listReportVersions(record.id),
     listAssetsForSite(active.org.id, record.site_id),
+    listReadingsForRecord(record.id),
   ]);
+  const jurisdiction = record.site?.jurisdiction_id
+    ? await getJurisdiction(record.site.jurisdiction_id)
+    : null;
+
+  // Schema-driven completeness: only runs if this work record is bound
+  // to an inspection template (template_form_id). Older records without
+  // a template_form_id skip the panel entirely.
+  const template = record.template_form_id
+    ? await getInspectionTemplate(record.template_form_id)
+    : null;
+  const completeness = template
+    ? checkCompleteness({
+        schema: template.schema_json,
+        workRecord: record,
+        observations,
+        readings,
+        assets,
+      })
+    : null;
 
   const role = active.role;
   const canReview = role === "admin" || role === "reviewer";
@@ -113,6 +138,35 @@ export default async function WorkRecordDetailPage({ params }: { params: { id: s
           <Row label="Site">{record.site?.name ?? "—"}</Row>
           <Row label="Visit type">{titleCase(record.record_type)}</Row>
           <Row label="Status"><WorkStatusBadge status={record.status} /></Row>
+          {jurisdiction ? (
+            <div className="sm:col-span-2 rounded border border-border/60 bg-muted/30 p-3">
+              <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Jurisdiction
+              </div>
+              <div className="mt-1 text-sm font-medium">
+                {jurisdiction.name}{" "}
+                <span className="font-normal text-muted-foreground">({jurisdiction.state})</span>
+              </div>
+              {jurisdiction.adopted_code ? (
+                <div className="text-xs text-muted-foreground">{jurisdiction.adopted_code}</div>
+              ) : null}
+              {Object.keys(jurisdiction.nfpa_editions ?? {}).length > 0 ? (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {Object.entries(jurisdiction.nfpa_editions).map(([std, ed]) => (
+                    <span
+                      key={std}
+                      className="rounded-sm border border-border bg-card px-1.5 py-0.5 font-mono text-[10.5px]"
+                    >
+                      {std} · {ed}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <div className="mt-2 text-[11px] text-muted-foreground">
+                AI drafting will use these editions and any local code amendments tied to this jurisdiction.
+              </div>
+            </div>
+          ) : null}
           <Row label="Technician">{record.technician?.full_name ?? "—"}</Row>
           <Row label="Reviewer">{record.reviewer?.full_name ?? "—"}</Row>
           <Row label="Scheduled">{formatDate(record.scheduled_for)}</Row>
@@ -321,6 +375,9 @@ export default async function WorkRecordDetailPage({ params }: { params: { id: s
           ) : null}
         </CardContent>
       </Card>
+
+      {/* Completeness check ------------------------------------------------ */}
+      {completeness ? <CompletenessPanel result={completeness} /> : null}
 
       {/* Workflow actions -------------------------------------------------- */}
       <Card>

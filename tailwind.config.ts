@@ -52,6 +52,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -59,7 +63,18 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        // tighter type scale — display sizes get punch, body stays modest
+        "display-lg": ["2.25rem", { lineHeight: "1.05", letterSpacing: "-0.025em" }],
+        "display":    ["1.5rem",  { lineHeight: "1.15", letterSpacing: "-0.02em"  }],
+      },
+      boxShadow: {
+        sm: "0 1px 0 0 hsl(var(--border))",
+        DEFAULT: "0 1px 2px 0 hsl(240 10% 7% / 0.05)",
+        card: "0 0 0 1px hsl(var(--border)), 0 1px 2px 0 hsl(240 10% 7% / 0.03)",
       },
     },
   },

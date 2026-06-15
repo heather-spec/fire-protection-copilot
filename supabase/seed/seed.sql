@@ -40,6 +40,28 @@ begin
   on conflict (id) do update set
     email = excluded.email,
     full_name = excluded.full_name;
+
+  -- IMPORTANT: Supabase Auth (GoTrue) requires a matching row in
+  -- auth.identities for every auth.users row. Without this, login fails
+  -- with "Database error querying schema". We insert one identity per
+  -- seeded user, using the email provider.
+  insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+  select
+    u.id::text,
+    u.id,
+    jsonb_build_object(
+      'sub', u.id::text,
+      'email', u.email,
+      'email_verified', true,
+      'phone_verified', false
+    ),
+    'email',
+    now(),
+    now(),
+    now()
+  from auth.users u
+  where u.id in (admin_id, reviewer_id, tech1_id, tech2_id)
+  on conflict do nothing;
 end$$;
 
 -- ---------------------------------------------------------------------

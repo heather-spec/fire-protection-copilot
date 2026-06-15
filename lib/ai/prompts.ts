@@ -19,12 +19,30 @@ You are a drafting assistant for a fire protection contractor's compliance platf
 Rules you MUST follow:
 - Use only facts that appear in the provided source inputs.
 - Never invent NFPA codes, dates, model numbers, manufacturer names, values, signatures, or measurements.
+- Never invent local jurisdiction code citations (e.g. Ohio Fire Code §, KY Standards of Safety §). If a local citation
+  appears in the inputs (see "Local code amendments" if provided), you may quote it. Otherwise cite only the
+  source NFPA reference that the technician recorded.
 - If a needed fact is missing, say "Information not provided" rather than guessing.
+- When a jurisdiction is specified, mention it in the opening sentence so the report is unambiguous
+  about which AHJ's adopted edition applies.
 - Begin every draft with the literal text "DRAFT — generated from technician inputs. Reviewer must verify before finalizing."
 - Write in clear, neutral, operational English. Avoid marketing tone.
 - Do not include legal disclaimers, customer pricing, or invoicing language.
 - Do not address the customer directly. Write in third person.
 `.trim();
+
+export interface JurisdictionContext {
+  name: string;                                // "Cincinnati Fire Department"
+  state: string;                               // "OH"
+  adoptedCode: string | null;                  // "Ohio Fire Code 2021"
+  nfpaEditions: Record<string, string>;        // { "NFPA 25": "2020" }
+  amendments?: Array<{
+    sourceRef: string;
+    localRef: string | null;
+    frequencyOverride: string | null;
+    description: string | null;
+  }>;
+}
 
 export interface SourceInputs {
   visitType: WorkRecordType;
@@ -36,6 +54,7 @@ export interface SourceInputs {
   summary: string | null;
   notes: string | null;
   voiceTranscript: string | null;
+  jurisdiction: JurisdictionContext | null;
   observations: Array<{
     description: string;
     result: string;
@@ -52,6 +71,27 @@ function renderSourceBlock(inp: SourceInputs): string {
   lines.push(`Site: ${inp.siteName}`);
   if (inp.technicianName) lines.push(`Technician: ${inp.technicianName}`);
   if (inp.completedAt) lines.push(`Completed: ${inp.completedAt}`);
+
+  if (inp.jurisdiction) {
+    const j = inp.jurisdiction;
+    lines.push(`Jurisdiction: ${j.name} (${j.state})`);
+    if (j.adoptedCode) lines.push(`Adopted code: ${j.adoptedCode}`);
+    const editions = Object.entries(j.nfpaEditions || {});
+    if (editions.length > 0) {
+      lines.push(
+        `Adopted editions: ${editions.map(([k, v]) => `${k}=${v}`).join(", ")}`,
+      );
+    }
+    if (j.amendments && j.amendments.length > 0) {
+      lines.push("Local code amendments (apply when source NFPA ref matches):");
+      for (const a of j.amendments) {
+        const freq = a.frequencyOverride ? `, freq=${a.frequencyOverride}` : "";
+        lines.push(
+          `- ${a.sourceRef} → ${a.localRef ?? "(local equivalent unspecified)"}${freq}${a.description ? ` — ${a.description}` : ""}`,
+        );
+      }
+    }
+  }
 
   if (inp.summary) {
     lines.push(`Summary: ${inp.summary}`);

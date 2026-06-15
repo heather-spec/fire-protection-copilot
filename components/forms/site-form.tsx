@@ -7,18 +7,20 @@ import { Select } from "@/components/ui/select";
 import { Field } from "@/components/ui/form-field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SubmitButton } from "./submit-button";
-import type { Customer, Site } from "@/lib/db/types";
+import type { Customer, Jurisdiction, Site } from "@/lib/db/types";
 
 type Action = (prev: unknown, form: FormData) => Promise<{ ok: true } | { ok: false; error: string }>;
 
 export function SiteForm({
   action,
   customers,
+  jurisdictions = [],
   initial,
   submitLabel = "Save",
 }: {
   action: Action;
   customers: Pick<Customer, "id" | "name">[];
+  jurisdictions?: Pick<Jurisdiction, "id" | "name" | "state" | "jurisdiction_type">[];
   initial?: Partial<Site>;
   submitLabel?: string;
 }) {
@@ -70,10 +72,28 @@ export function SiteForm({
         <Field label="Square footage" htmlFor="square_footage">
           <Input id="square_footage" name="square_footage" type="number" defaultValue={initial?.square_footage ?? ""} />
         </Field>
-        <Field label="AHJ" htmlFor="ahj" hint="Authority having jurisdiction">
-          <Input id="ahj" name="ahj" defaultValue={initial?.ahj ?? ""} />
+        <Field
+          label="Jurisdiction (AHJ)"
+          htmlFor="jurisdiction_id"
+          hint="Determines which code citations apply"
+        >
+          <Select
+            id="jurisdiction_id"
+            name="jurisdiction_id"
+            defaultValue={initial?.jurisdiction_id ?? ""}
+          >
+            <option value="">— none —</option>
+            {jurisdictions.map((j) => (
+              <option key={j.id} value={j.id}>
+                {j.state} · {j.name}
+              </option>
+            ))}
+          </Select>
         </Field>
       </div>
+      <Field label="AHJ contact / notes" htmlFor="ahj" hint="Free-text name if no jurisdiction matches — kept for back-compat">
+        <Input id="ahj" name="ahj" defaultValue={initial?.ahj ?? ""} />
+      </Field>
       <Field label="Notes" htmlFor="notes">
         <Textarea id="notes" name="notes" defaultValue={initial?.notes ?? ""} rows={3} />
       </Field>

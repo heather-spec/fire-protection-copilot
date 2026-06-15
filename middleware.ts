@@ -1,16 +1,14 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  return updateSession(request);
+/**
+ * DEMO MODE — auth is disabled. Middleware just passes every request through.
+ */
+export function middleware(_request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all paths except:
-     *  _next/static, _next/image, favicon.ico, public files, api/auth
-     */
-    "/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

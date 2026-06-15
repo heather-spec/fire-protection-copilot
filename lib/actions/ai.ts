@@ -18,7 +18,7 @@ async function loadSourceInputs(orgId: string, workRecordId: string): Promise<So
     .select(`
       record_type, reference_code, summary, notes, voice_transcript, completed_at,
       customer:customers(name),
-      site:sites(name),
+      site:sites(name, jurisdiction_id),
       technician:profiles!work_records_technician_id_fkey(full_name)
     `)
     .eq("id", workRecordId)
@@ -33,18 +33,26 @@ async function loadSourceInputs(orgId: string, workRecordId: string): Promise<So
     .eq("work_record_id", workRecordId)
     .order("created_at", { ascending: true });
 
+  // Pull jurisdiction context if the site has one
+  const site = r.site as unknown as { name: string; jurisdiction_id: string | null } | null;
+  let jurisdiction: SourceInputs["jurisdiction"] = null;
+  if (site?.jurisdiction_id) {
+    jurisdiction = await loadJurisdictionContext(site.jurisdiction_id, obs ?? []);
+  }
+
   return {
     visitType: r.record_type,
     referenceCode: r.reference_code,
     customerName:
       (r.customer as unknown as { name: string } | null)?.name ?? "(unknown customer)",
-    siteName: (r.site as unknown as { name: string } | null)?.name ?? "(unknown site)",
+    siteName: site?.name ?? "(unknown site)",
     technicianName:
       (r.technician as unknown as { full_name: string } | null)?.full_name ?? null,
     completedAt: r.completed_at,
     summary: r.summary,
     notes: r.notes,
     voiceTranscript: r.voice_transcript,
+    jurisdiction,
     observations: (obs ?? []).map((o: {
       description: string; result: string; check_code: string | null; notes: string | null;
     }) => ({
@@ -53,6 +61,72 @@ async function loadSourceInputs(orgId: string, workRecordId: string): Promise<So
       code: o.check_code,
       notes: o.notes,
     })),
+  };
+}
+
+/**
+ * Loads jurisdiction info AND any amendments matching the observation codes
+ * recorded on this work record. Amendments are filtered so we only feed the
+ * model what's actually relevant — avoids overwhelming context with every
+ * row from the state-level amendments table.
+ */
+async function loadJurisdictionContext(
+  jurisdictionId: string,
+  observations: Array<{ check_code: string | null }>,
+): Promise<SourceInputs["jurisdiction"] | null> {
+  const { data: j } = await supa()
+    .from("jurisdictions")
+    .select("id, name, state, adopted_code, nfpa_editions, parent_id")
+    .eq("id", jurisdictionId)
+    .maybeSingle();
+  if (!j) return null;
+
+  // walk parent chain so a city AHJ inherits state amendments
+  const ids: string[] = [];
+  let cur: string | null = j.id as string;
+  let par: string | null = j.parent_id as string | null;
+  for (let i = 0; i < 5; i++) {
+    if (!cur) break;
+    ids.push(cur);
+    if (!par) break;
+    cur = par;
+    const { data: p } = await supa()
+      .from("jurisdictions")
+      .select("parent_id")
+      .eq("id", cur)
+      .maybeSingle();
+    par = (p?.parent_id as string | null) ?? null;
+  }
+
+  // pull only amendments whose source_ref matches a recorded observation code
+  const observedRefs = observations
+    .map((o) => o.check_code?.trim())
+    .filter((c): c is string => !!c && c.length > 0);
+
+  let amendments: NonNullable<SourceInputs["jurisdiction"]>["amendments"] = [];
+  if (observedRefs.length > 0) {
+    const { data: rows } = await supa()
+      .from("code_amendments")
+      .select("source_ref, local_ref, frequency_override, description")
+      .in("jurisdiction_id", ids)
+      .in("source_ref", observedRefs);
+    amendments = (rows ?? []).map((a: {
+      source_ref: string; local_ref: string | null;
+      frequency_override: string | null; description: string | null;
+    }) => ({
+      sourceRef: a.source_ref,
+      localRef: a.local_ref,
+      frequencyOverride: a.frequency_override,
+      description: a.description,
+    }));
+  }
+
+  return {
+    name: j.name as string,
+    state: j.state as string,
+    adoptedCode: (j.adopted_code as string | null) ?? null,
+    nfpaEditions: (j.nfpa_editions as Record<string, string>) ?? {},
+    amendments,
   };
 }
 

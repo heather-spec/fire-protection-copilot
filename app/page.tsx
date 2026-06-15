@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Middleware handles auth-aware redirects.  This is the bare fallback.
+// DEMO MODE — no login. Land straight on the dashboard.
 export default function Index() {
-  redirect("/login");
+  redirect("/dashboard");
 }

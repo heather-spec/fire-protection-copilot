@@ -13,10 +13,19 @@
 -- =====================================================================
 
 -- ---------- enum extensions ----------
+-- NOTE: ALTER TYPE ... ADD VALUE cannot be used in the same transaction
+-- as a statement that references the new value. When running this file
+-- through the Supabase SQL Editor (which wraps everything in one tx),
+-- run the two alter-type statements below as their OWN query first, then
+-- run the rest of this file as a second query.
 alter type work_record_status add value if not exists 'revision_requested' before 'approved';
 alter type work_record_type   add value if not exists 'deficiency_followup' after 'service_call';
 
-create type deficiency_priority as enum ('urgent','high','normal','low');
+do $$ begin
+  if not exists (select 1 from pg_type where typname = 'deficiency_priority') then
+    create type deficiency_priority as enum ('urgent','high','normal','low');
+  end if;
+end $$;
 
 -- ---------- work_records new columns ----------
 alter table work_records
@@ -142,6 +151,7 @@ with check ( public.is_org_member(org_id) );
 
 -- ---------- update work_records UPDATE policy to allow revision_requested ----------
 drop policy if exists "tech updates own draft, reviewer/admin updates any" on work_records;
+drop policy if exists "tech edits own draft/revision; reviewer/admin edits any" on work_records;
 create policy "tech edits own draft/revision; reviewer/admin edits any"
 on work_records for update to authenticated
 using (

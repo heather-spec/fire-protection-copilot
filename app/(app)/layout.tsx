@@ -1,26 +1,20 @@
-import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/app-shell/sidebar";
 import { Topbar } from "@/components/app-shell/topbar";
 import { getActiveOrg, getCurrentProfile } from "@/lib/db/queries";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  // DEMO MODE — getCurrentProfile + getActiveOrg always succeed via lib/demo/identity.ts
   const [profile, active] = await Promise.all([getCurrentProfile(), getActiveOrg()]);
-
-  if (!profile) redirect("/login");
-
-  if (!active) {
+  if (!profile || !active) {
     return (
       <div className="grid min-h-screen place-items-center bg-background p-6">
         <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-sm">
-          <h1 className="text-lg font-semibold">You&apos;re signed in, but not in any organization yet.</h1>
+          <h1 className="text-lg font-semibold">Demo data not ready.</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Ask an admin to add you to an organization to access the app.
+            The demo profile or organization couldn&apos;t be loaded. Make sure
+            the database seed has been applied and that <code>hnianouris@gmail.com</code>
+            has a profile row.
           </p>
-          <form action="/api/auth/signout" method="post" className="mt-6">
-            <button className="text-sm font-medium text-primary underline-offset-4 hover:underline" type="submit">
-              Sign out
-            </button>
-          </form>
         </div>
       </div>
     );

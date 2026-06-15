@@ -85,7 +85,19 @@ export default async function SiteDetailPage({ params }: { params: { id: string 
             </Row>
             <Row label="Occupancy">{site.occupancy_type ?? "—"}</Row>
             <Row label="Square footage">{site.square_footage?.toLocaleString() ?? "—"}</Row>
-            <Row label="AHJ">{site.ahj ?? "—"}</Row>
+            <Row label="Jurisdiction">
+              {site.jurisdiction ? (
+                <div className="space-y-0.5">
+                  <div>
+                    <span className="font-medium">{site.jurisdiction.name}</span>
+                    <span className="ml-1.5 text-xs text-muted-foreground">({site.jurisdiction.state})</span>
+                  </div>
+                  {site.jurisdiction.adopted_code ? (
+                    <div className="text-xs text-muted-foreground">{site.jurisdiction.adopted_code}</div>
+                  ) : null}
+                </div>
+              ) : site.ahj ? site.ahj : "—"}
+            </Row>
             {site.notes ? (
               <div>
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Notes</div>

@@ -1,7 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import type { DeficiencySeverity, DeficiencyStatus, WorkRecordStatus } from "@/lib/db/types";
 
-const workStatus: Record<WorkRecordStatus, { label: string; variant: "secondary" | "warning" | "success" | "destructive" | "outline" }> = {
+type Variant = "default" | "secondary" | "outline" | "success" | "warning" | "destructive" | "brand";
+
+const workStatus: Record<WorkRecordStatus, { label: string; variant: Variant }> = {
   draft:              { label: "Draft",       variant: "outline" },
   submitted:          { label: "Submitted",   variant: "warning" },
   in_review:          { label: "In review",   variant: "warning" },
@@ -15,11 +17,11 @@ export function WorkStatusBadge({ status }: { status: WorkRecordStatus }) {
   return <Badge variant={s.variant}>{s.label}</Badge>;
 }
 
-const defStatus: Record<DeficiencyStatus, { label: string; variant: "secondary" | "warning" | "success" | "destructive" | "outline" }> = {
-  open:         { label: "Open",        variant: "destructive" },
-  in_progress:  { label: "In progress", variant: "warning" },
-  resolved:     { label: "Resolved",    variant: "success" },
-  wont_fix:     { label: "Won't fix",   variant: "outline" },
+const defStatus: Record<DeficiencyStatus, { label: string; variant: Variant }> = {
+  open:        { label: "Open",        variant: "destructive" },
+  in_progress: { label: "In progress", variant: "warning" },
+  resolved:    { label: "Resolved",    variant: "success" },
+  wont_fix:    { label: "Won't fix",   variant: "outline" },
 };
 
 export function DeficiencyStatusBadge({ status }: { status: DeficiencyStatus }) {
@@ -27,7 +29,7 @@ export function DeficiencyStatusBadge({ status }: { status: DeficiencyStatus }) 
   return <Badge variant={s.variant}>{s.label}</Badge>;
 }
 
-const sev: Record<DeficiencySeverity, { label: string; variant: "secondary" | "warning" | "success" | "destructive" | "outline" }> = {
+const sev: Record<DeficiencySeverity, { label: string; variant: Variant }> = {
   critical: { label: "Critical", variant: "destructive" },
   major:    { label: "Major",    variant: "warning" },
   minor:    { label: "Minor",    variant: "secondary" },

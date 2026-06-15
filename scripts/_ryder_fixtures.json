@@ -1,0 +1,600 @@
+{
+  "_meta": {
+    "description": "Anonymized Ryder-style demo fixtures for the Fire Protection Compliance Copilot. Derived from a real RTF Fire inspection job (Ryder Warehouse Hebron, 5/28/2026). Customer name, street address, all serial numbers, job number, phone, email, and inspector identity are anonymized. Manufacturer + model values are real-world public product data and are kept verbatim to make the demo look authentic.",
+    "anonymization": {
+      "customer_name": "Ryder Warehouse Hebron -> Sample Distribution Center (anon)",
+      "street_address": "real street -> 1000 Sample Logistics Ln",
+      "city_state_zip": "kept (Hebron, KY 41048 is generic enough)",
+      "phone": "real -> 555-0100",
+      "email": "real -> facilities@sample.com",
+      "job_number": "48447680 -> DEMO-2026-0001",
+      "inspector": "real -> Demo Inspector",
+      "serial_numbers": "real -> DEMO-* pattern",
+      "inspection_date": "kept (2026-05-28)"
+    },
+    "org_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "technician_id": "33333333-3333-3333-3333-333333333333",
+    "reviewer_id": "22222222-2222-2222-2222-222222222222"
+  },
+
+  "customer": {
+    "id": "ccdd0001-0000-0000-0000-000000000001",
+    "name": "Sample Distribution Center (anon)",
+    "contact_name": "Demo Facilities Manager",
+    "contact_email": "facilities@sample.com",
+    "contact_phone": "555-0100",
+    "billing_address": "1000 Sample Logistics Ln, Hebron, KY 41048"
+  },
+
+  "site": {
+    "id": "ddee0001-0000-0000-0000-000000000001",
+    "name": "Sample DC - Hebron",
+    "address_line1": "1000 Sample Logistics Ln",
+    "address_line2": null,
+    "city": "Hebron",
+    "state": "KY",
+    "postal_code": "41048",
+    "occupancy_type": "Storage S-1",
+    "square_footage": 540000,
+    "notes": "Single-building distribution center, dry storage, high-pile rack."
+  },
+
+  "assets": [
+    {
+      "id": "a5500001-0000-0000-0000-000000000001",
+      "asset_type": "fire_pump",
+      "identifier": "FP-DEMO-001",
+      "manufacturer": "Peerless",
+      "model": "8x6 HSC",
+      "serial_number": "DEMO-PEERLESS-001",
+      "metadata": {
+        "asset_role": "main_pump",
+        "rated_gpm": 1500,
+        "rated_psi": 90,
+        "rated_rpm": 1770,
+        "suction_from": "City main"
+      }
+    },
+    {
+      "id": "a5500001-0000-0000-0000-000000000002",
+      "asset_type": "fire_pump",
+      "identifier": "FP-DEMO-001-JOCKEY",
+      "manufacturer": "Grundfos",
+      "model": "CR-10",
+      "serial_number": "DEMO-GRUNDFOS-001",
+      "metadata": {
+        "asset_role": "jockey_pump",
+        "hp": 5,
+        "gpm": 15,
+        "flange_size": "1.25\""
+      }
+    },
+    {
+      "id": "a5500001-0000-0000-0000-000000000003",
+      "asset_type": "fire_pump",
+      "identifier": "FP-DEMO-001-MOTOR",
+      "manufacturer": "Baldor",
+      "model": "M4400T",
+      "serial_number": "DEMO-BALDOR-001",
+      "metadata": {
+        "asset_role": "pump_motor",
+        "rated_hp": 100,
+        "rated_volts": 460,
+        "rated_amps": 124,
+        "rpm": 1770
+      }
+    },
+    {
+      "id": "a5500002-0000-0000-0000-000000000001",
+      "asset_type": "backflow_preventer",
+      "identifier": "BF-DEMO-001",
+      "manufacturer": "Wilkins",
+      "model": "350A",
+      "serial_number": "DEMO-W350A-001",
+      "metadata": {
+        "asset_role": "device",
+        "size": "4\"",
+        "type_of_device": "RPZ",
+        "location": "Riser room, north wall"
+      }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000001",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-1",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "NW corner of lot" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000002",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-2",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "N drive, east of dock 12" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000003",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-3",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "NE corner of lot" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000004",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-4",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "E side, mid-building" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000005",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-5",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "SE corner of lot" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000006",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-6",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "S drive, west of dock 48" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000007",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-7",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "SW corner of lot" }
+    },
+    {
+      "id": "a5500003-0000-0000-0000-000000000008",
+      "asset_type": "hydrant",
+      "identifier": "HYD-DEMO-8",
+      "manufacturer": "Kennedy",
+      "model": "K81-D",
+      "serial_number": null,
+      "metadata": { "asset_role": "hydrant", "year": "2018", "location": "W side, near riser room" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000001",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-1",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 1 (rack area A)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000002",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-2",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 2 (rack area B)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000003",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-3",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 3 (rack area C)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000004",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-4",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 4 (rack area D)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000005",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-5",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 5 (rack area E)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000006",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-6",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 6 (rack area F)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000007",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-7",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 7 (rack area G)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000008",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-8",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Riser room - System 8 (rack area H)" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000009",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-9",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Mezzanine office wing" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000010",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-10",
+      "manufacturer": "Viking",
+      "model": "G-6000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Wet", "valve_location": "Shipping office" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000011",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-11",
+      "manufacturer": "Viking",
+      "model": "E-1",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Dry", "valve_location": "Loading dock canopy north" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000012",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-12",
+      "manufacturer": "Viking",
+      "model": "E-1",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Dry", "valve_location": "Loading dock canopy south" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000013",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-13",
+      "manufacturer": "Viking",
+      "model": "E-1",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Dry", "valve_location": "Outdoor maintenance shed" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000014",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-14",
+      "manufacturer": "Viking",
+      "model": "G-3000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Pre-action", "valve_location": "Server / IDF room" }
+    },
+    {
+      "id": "a5500004-0000-0000-0000-000000000015",
+      "asset_type": "sprinkler_system",
+      "identifier": "SYS-15",
+      "manufacturer": "Viking",
+      "model": "G-3000",
+      "serial_number": null,
+      "metadata": { "asset_role": "sprinkler_system", "system_type": "Pre-action", "valve_location": "Battery room" }
+    }
+  ],
+
+  "work_records": [
+    {
+      "id": "11110001-0000-0000-0000-000000000001",
+      "template_form_id": "annual_inspection_v1",
+      "record_type": "inspection",
+      "status": "submitted",
+      "reference_code": "ANN-2026-0001",
+      "scheduled_for": "2026-05-28T13:00:00Z",
+      "completed_at": "2026-05-28T19:30:00Z",
+      "summary": "Annual NFPA 25 inspection of all water-based fire protection systems at Sample DC - Hebron. All systems operational; minor deficiency flagged on Dry System 12 dry-pipe valve trim (slow trip time).",
+      "metadata": {
+        "servicetrade": {
+          "location_name": "Sample Distribution Center (anon)",
+          "location_street": "1000 Sample Logistics Ln",
+          "location_city": "Hebron, KY 41048",
+          "location_phone": "555-0100",
+          "location_email": "facilities@sample.com",
+          "job_number": "DEMO-2026-0001",
+          "job_dates": "2026-05-28",
+          "job_technicians": "Demo Inspector"
+        }
+      },
+      "observations": [
+        { "check_code": "wet_systems_in_service", "description": "All wet-pipe systems in service", "result": "yes" },
+        { "check_code": "wet_systems_gauges_normal", "description": "Wet system gauges read within normal range", "result": "yes" },
+        { "check_code": "dry_systems_in_service", "description": "All dry-pipe systems in service", "result": "yes" },
+        { "check_code": "dry_systems_air_pressure_normal", "description": "Dry system air pressure within normal range", "result": "yes" },
+        { "check_code": "preaction_systems_in_service", "description": "Pre-action systems in service", "result": "yes" },
+        { "check_code": "alarms_audible", "description": "Audible alarms test satisfactorily", "result": "yes" },
+        { "check_code": "alarms_water_motor_gong", "description": "Water motor gong operates", "result": "yes" },
+        { "check_code": "sprinklers_no_obstructions", "description": "No obstructions to sprinkler discharge observed", "result": "yes" },
+        { "check_code": "antifreeze_present", "description": "Antifreeze systems present", "result": "no" },
+        { "check_code": "dry_pipe_valve_12_trip_time", "description": "Dry-pipe valve System 12 trip time within spec", "result": "no", "notes": "Trip time 78 sec, spec 60 sec. Deficiency documented." }
+      ],
+      "readings": []
+    },
+
+    {
+      "id": "11110002-0000-0000-0000-000000000001",
+      "template_form_id": "riser_v1",
+      "record_type": "inspection",
+      "status": "submitted",
+      "reference_code": "RSR-2026-0001",
+      "scheduled_for": "2026-05-28T13:00:00Z",
+      "completed_at": "2026-05-28T16:45:00Z",
+      "summary": "Riser inspection - 15 systems documented (10 wet, 3 dry, 2 pre-action). Pressures recorded at each riser. System 12 dry trim flagged for follow-up.",
+      "metadata": {
+        "servicetrade": {
+          "location_name": "Sample Distribution Center (anon)",
+          "job_number": "DEMO-2026-0001",
+          "job_dates": "2026-05-28",
+          "job_technicians": "Demo Inspector"
+        }
+      },
+      "observations": [
+        { "check_code": "sys1_in_service", "description": "System 1 in service", "result": "yes", "group_key": "system_row_1" },
+        { "check_code": "sys2_in_service", "description": "System 2 in service", "result": "yes", "group_key": "system_row_2" },
+        { "check_code": "sys3_in_service", "description": "System 3 in service", "result": "yes", "group_key": "system_row_3" },
+        { "check_code": "sys4_in_service", "description": "System 4 in service", "result": "yes", "group_key": "system_row_4" },
+        { "check_code": "sys5_in_service", "description": "System 5 in service", "result": "yes", "group_key": "system_row_5" },
+        { "check_code": "sys6_in_service", "description": "System 6 in service", "result": "yes", "group_key": "system_row_6" },
+        { "check_code": "sys7_in_service", "description": "System 7 in service", "result": "yes", "group_key": "system_row_7" },
+        { "check_code": "sys8_in_service", "description": "System 8 in service", "result": "yes", "group_key": "system_row_8" },
+        { "check_code": "sys9_in_service", "description": "System 9 in service", "result": "yes", "group_key": "system_row_9" },
+        { "check_code": "sys10_in_service", "description": "System 10 in service", "result": "yes", "group_key": "system_row_10" },
+        { "check_code": "sys11_in_service", "description": "System 11 in service", "result": "yes", "group_key": "system_row_11" },
+        { "check_code": "sys12_in_service", "description": "System 12 in service - trim slow", "result": "yes", "notes": "Slow trip on test; deficiency raised.", "group_key": "system_row_12" },
+        { "check_code": "sys13_in_service", "description": "System 13 in service", "result": "yes", "group_key": "system_row_13" },
+        { "check_code": "sys14_in_service", "description": "System 14 in service", "result": "yes", "group_key": "system_row_14" },
+        { "check_code": "sys15_in_service", "description": "System 15 in service", "result": "yes", "group_key": "system_row_15" }
+      ],
+      "readings": [
+        { "field_name": "press_before", "value_numeric": 65, "unit": "PSI", "group_key": "system_row_1" },
+        { "field_name": "flow_press",   "value_numeric": 55, "unit": "PSI", "group_key": "system_row_1" },
+        { "field_name": "press_after",  "value_numeric": 65, "unit": "PSI", "group_key": "system_row_1" },
+        { "field_name": "press_before", "value_numeric": 66, "unit": "PSI", "group_key": "system_row_2" },
+        { "field_name": "flow_press",   "value_numeric": 56, "unit": "PSI", "group_key": "system_row_2" },
+        { "field_name": "press_after",  "value_numeric": 66, "unit": "PSI", "group_key": "system_row_2" },
+        { "field_name": "press_before", "value_numeric": 64, "unit": "PSI", "group_key": "system_row_3" },
+        { "field_name": "flow_press",   "value_numeric": 54, "unit": "PSI", "group_key": "system_row_3" },
+        { "field_name": "press_after",  "value_numeric": 64, "unit": "PSI", "group_key": "system_row_3" },
+        { "field_name": "press_before", "value_numeric": 65, "unit": "PSI", "group_key": "system_row_4" },
+        { "field_name": "flow_press",   "value_numeric": 55, "unit": "PSI", "group_key": "system_row_4" },
+        { "field_name": "press_after",  "value_numeric": 65, "unit": "PSI", "group_key": "system_row_4" },
+        { "field_name": "press_before", "value_numeric": 65, "unit": "PSI", "group_key": "system_row_5" },
+        { "field_name": "flow_press",   "value_numeric": 55, "unit": "PSI", "group_key": "system_row_5" },
+        { "field_name": "press_after",  "value_numeric": 65, "unit": "PSI", "group_key": "system_row_5" },
+        { "field_name": "press_before", "value_numeric": 67, "unit": "PSI", "group_key": "system_row_6" },
+        { "field_name": "flow_press",   "value_numeric": 57, "unit": "PSI", "group_key": "system_row_6" },
+        { "field_name": "press_after",  "value_numeric": 67, "unit": "PSI", "group_key": "system_row_6" },
+        { "field_name": "press_before", "value_numeric": 66, "unit": "PSI", "group_key": "system_row_7" },
+        { "field_name": "flow_press",   "value_numeric": 56, "unit": "PSI", "group_key": "system_row_7" },
+        { "field_name": "press_after",  "value_numeric": 66, "unit": "PSI", "group_key": "system_row_7" },
+        { "field_name": "press_before", "value_numeric": 65, "unit": "PSI", "group_key": "system_row_8" },
+        { "field_name": "flow_press",   "value_numeric": 55, "unit": "PSI", "group_key": "system_row_8" },
+        { "field_name": "press_after",  "value_numeric": 65, "unit": "PSI", "group_key": "system_row_8" },
+        { "field_name": "press_before", "value_numeric": 64, "unit": "PSI", "group_key": "system_row_9" },
+        { "field_name": "flow_press",   "value_numeric": 54, "unit": "PSI", "group_key": "system_row_9" },
+        { "field_name": "press_after",  "value_numeric": 64, "unit": "PSI", "group_key": "system_row_9" },
+        { "field_name": "press_before", "value_numeric": 63, "unit": "PSI", "group_key": "system_row_10" },
+        { "field_name": "flow_press",   "value_numeric": 53, "unit": "PSI", "group_key": "system_row_10" },
+        { "field_name": "press_after",  "value_numeric": 63, "unit": "PSI", "group_key": "system_row_10" },
+        { "field_name": "press_before", "value_numeric": 50, "unit": "PSI", "group_key": "system_row_11" },
+        { "field_name": "flow_press",   "value_numeric": 42, "unit": "PSI", "group_key": "system_row_11" },
+        { "field_name": "press_after",  "value_numeric": 50, "unit": "PSI", "group_key": "system_row_11" },
+        { "field_name": "press_before", "value_numeric": 50, "unit": "PSI", "group_key": "system_row_12" },
+        { "field_name": "flow_press",   "value_numeric": 41, "unit": "PSI", "group_key": "system_row_12" },
+        { "field_name": "press_after",  "value_numeric": 50, "unit": "PSI", "group_key": "system_row_12" },
+        { "field_name": "press_before", "value_numeric": 51, "unit": "PSI", "group_key": "system_row_13" },
+        { "field_name": "flow_press",   "value_numeric": 43, "unit": "PSI", "group_key": "system_row_13" },
+        { "field_name": "press_after",  "value_numeric": 51, "unit": "PSI", "group_key": "system_row_13" },
+        { "field_name": "press_before", "value_numeric": 60, "unit": "PSI", "group_key": "system_row_14" },
+        { "field_name": "flow_press",   "value_numeric": 52, "unit": "PSI", "group_key": "system_row_14" },
+        { "field_name": "press_after",  "value_numeric": 60, "unit": "PSI", "group_key": "system_row_14" },
+        { "field_name": "press_before", "value_numeric": 60, "unit": "PSI", "group_key": "system_row_15" },
+        { "field_name": "flow_press",   "value_numeric": 52, "unit": "PSI", "group_key": "system_row_15" },
+        { "field_name": "press_after",  "value_numeric": 60, "unit": "PSI", "group_key": "system_row_15" }
+      ]
+    },
+
+    {
+      "id": "11110003-0000-0000-0000-000000000001",
+      "template_form_id": "fire_pump_v1",
+      "record_type": "test",
+      "status": "submitted",
+      "reference_code": "FP-2026-0001",
+      "scheduled_for": "2026-05-28T13:00:00Z",
+      "completed_at": "2026-05-28T15:15:00Z",
+      "summary": "Annual fire pump performance test. Main pump met rated GPM at rated PSI; jockey pump cycled normally; motor draw within spec. No deficiencies.",
+      "metadata": {
+        "servicetrade": {
+          "location_name": "Sample Distribution Center (anon)",
+          "job_number": "DEMO-2026-0001",
+          "job_dates": "2026-05-28",
+          "job_technicians": "Demo Inspector"
+        }
+      },
+      "observations": [
+        { "check_code": "pump_room_temp_ok", "description": "Pump room temperature within range", "result": "yes" },
+        { "check_code": "controller_in_auto", "description": "Controller in AUTO position", "result": "yes" },
+        { "check_code": "suction_supply_normal", "description": "Suction supply normal", "result": "yes" },
+        { "check_code": "jockey_cycle_ok", "description": "Jockey pump cycles within normal range", "result": "yes" },
+        { "check_code": "no_leaks_observed", "description": "No leaks observed at packing or seals", "result": "yes" }
+      ],
+      "readings": [
+        { "field_name": "churn_suction_psi",  "value_numeric": 65, "unit": "PSI", "group_key": "flow_test_churn" },
+        { "field_name": "churn_discharge_psi","value_numeric": 125,"unit": "PSI", "group_key": "flow_test_churn" },
+        { "field_name": "churn_rpm",          "value_numeric": 1770,"unit": "RPM","group_key": "flow_test_churn" },
+        { "field_name": "churn_amps",         "value_numeric": 95, "unit": "A",   "group_key": "flow_test_churn" },
+
+        { "field_name": "rated_suction_psi",  "value_numeric": 60, "unit": "PSI", "group_key": "flow_test_rated" },
+        { "field_name": "rated_discharge_psi","value_numeric": 95, "unit": "PSI", "group_key": "flow_test_rated" },
+        { "field_name": "rated_gpm",          "value_numeric": 1500,"unit": "GPM","group_key": "flow_test_rated" },
+        { "field_name": "rated_rpm",          "value_numeric": 1770,"unit": "RPM","group_key": "flow_test_rated" },
+        { "field_name": "rated_amps",         "value_numeric": 124,"unit": "A",   "group_key": "flow_test_rated" },
+
+        { "field_name": "peak_suction_psi",   "value_numeric": 55, "unit": "PSI", "group_key": "flow_test_peak" },
+        { "field_name": "peak_discharge_psi", "value_numeric": 70, "unit": "PSI", "group_key": "flow_test_peak" },
+        { "field_name": "peak_gpm",           "value_numeric": 2250,"unit": "GPM","group_key": "flow_test_peak" },
+        { "field_name": "peak_rpm",           "value_numeric": 1770,"unit": "RPM","group_key": "flow_test_peak" },
+        { "field_name": "peak_amps",          "value_numeric": 138,"unit": "A",   "group_key": "flow_test_peak" }
+      ]
+    },
+
+    {
+      "id": "11110004-0000-0000-0000-000000000001",
+      "template_form_id": "fire_hydrant_v1",
+      "record_type": "inspection",
+      "status": "submitted",
+      "reference_code": "HYD-2026-0001",
+      "scheduled_for": "2026-05-28T13:00:00Z",
+      "completed_at": "2026-05-28T17:30:00Z",
+      "summary": "Annual hydrant inspection - 8 private hydrants flow-tested and lubricated. Hydrant 5 cap missing chain; deficiency raised.",
+      "metadata": {
+        "servicetrade": {
+          "location_name": "Sample Distribution Center (anon)",
+          "job_number": "DEMO-2026-0001",
+          "job_dates": "2026-05-28",
+          "job_technicians": "Demo Inspector"
+        }
+      },
+      "observations": [
+        { "check_code": "hyd1_operational", "description": "Hydrant 1 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_1" },
+        { "check_code": "hyd2_operational", "description": "Hydrant 2 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_2" },
+        { "check_code": "hyd3_operational", "description": "Hydrant 3 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_3" },
+        { "check_code": "hyd4_operational", "description": "Hydrant 4 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_4" },
+        { "check_code": "hyd5_operational", "description": "Hydrant 5 operational; cap chain missing", "result": "yes", "notes": "Deficiency: cap chain missing.", "group_key": "hydrant_slot_5" },
+        { "check_code": "hyd6_operational", "description": "Hydrant 6 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_6" },
+        { "check_code": "hyd7_operational", "description": "Hydrant 7 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_7" },
+        { "check_code": "hyd8_operational", "description": "Hydrant 8 operational and lubricated", "result": "yes", "group_key": "hydrant_slot_8" }
+      ],
+      "readings": [
+        { "field_name": "static_psi",   "value_numeric": 68, "unit": "PSI", "group_key": "hydrant_slot_1" },
+        { "field_name": "residual_psi", "value_numeric": 52, "unit": "PSI", "group_key": "hydrant_slot_1" },
+        { "field_name": "static_psi",   "value_numeric": 67, "unit": "PSI", "group_key": "hydrant_slot_2" },
+        { "field_name": "residual_psi", "value_numeric": 51, "unit": "PSI", "group_key": "hydrant_slot_2" },
+        { "field_name": "static_psi",   "value_numeric": 69, "unit": "PSI", "group_key": "hydrant_slot_3" },
+        { "field_name": "residual_psi", "value_numeric": 53, "unit": "PSI", "group_key": "hydrant_slot_3" },
+        { "field_name": "static_psi",   "value_numeric": 68, "unit": "PSI", "group_key": "hydrant_slot_4" },
+        { "field_name": "residual_psi", "value_numeric": 52, "unit": "PSI", "group_key": "hydrant_slot_4" },
+        { "field_name": "static_psi",   "value_numeric": 66, "unit": "PSI", "group_key": "hydrant_slot_5" },
+        { "field_name": "residual_psi", "value_numeric": 50, "unit": "PSI", "group_key": "hydrant_slot_5" },
+        { "field_name": "static_psi",   "value_numeric": 67, "unit": "PSI", "group_key": "hydrant_slot_6" },
+        { "field_name": "residual_psi", "value_numeric": 51, "unit": "PSI", "group_key": "hydrant_slot_6" },
+        { "field_name": "static_psi",   "value_numeric": 68, "unit": "PSI", "group_key": "hydrant_slot_7" },
+        { "field_name": "residual_psi", "value_numeric": 52, "unit": "PSI", "group_key": "hydrant_slot_7" },
+        { "field_name": "static_psi",   "value_numeric": 69, "unit": "PSI", "group_key": "hydrant_slot_8" },
+        { "field_name": "residual_psi", "value_numeric": 53, "unit": "PSI", "group_key": "hydrant_slot_8" }
+      ]
+    },
+
+    {
+      "id": "11110005-0000-0000-0000-000000000001",
+      "template_form_id": "backflow_v1",
+      "record_type": "test",
+      "status": "submitted",
+      "reference_code": "BF-2026-0001",
+      "scheduled_for": "2026-05-28T13:00:00Z",
+      "completed_at": "2026-05-28T14:00:00Z",
+      "summary": "Annual backflow test on Wilkins 350A 4-inch RPZ. Device passed all checks - initial 0 PSID, relief opened at 2.4 PSID (spec >= 2.0 PSID), no leakage observed.",
+      "metadata": {
+        "servicetrade": {
+          "location_name": "Sample Distribution Center (anon)",
+          "location_street": "1000 Sample Logistics Ln",
+          "location_city": "Hebron, KY 41048",
+          "location_phone": "555-0100",
+          "location_email": "facilities@sample.com",
+          "job_number": "DEMO-2026-0001",
+          "job_dates": "2026-05-28",
+          "job_technicians": "Demo Inspector"
+        },
+        "signatures": [
+          { "role": "inspector", "name": "Demo Inspector", "cert_no": "BF-DEMO-9001", "signed_at": "2026-05-28T14:05:00Z" }
+        ]
+      },
+      "observations": [
+        { "check_code": "Check Valve 1 Tight", "description": "Check valve 1 holds 1.0 PSID minimum", "result": "yes", "group_key": "device_under_test" },
+        { "check_code": "Check Valve 2 Tight", "description": "Check valve 2 holds 1.0 PSID minimum", "result": "yes", "group_key": "device_under_test" },
+        { "check_code": "Relief Valve Open",   "description": "Relief valve opens at proper PSID",   "result": "yes", "group_key": "device_under_test" },
+        { "check_code": "PASSED",              "description": "Test result: passed",                  "result": "yes", "group_key": "device_under_test" },
+        { "check_code": "FAILED",              "description": "Test result: failed",                  "result": "no",  "group_key": "device_under_test" }
+      ],
+      "readings": [
+        { "field_name": "TEST GUAGE TYPE",          "value_text":    "Mid-West 845-5",      "group_key": "device_under_test" },
+        { "field_name": "TEST GAUGE SERIAL",        "value_text":    "DEMO-GAUGE-1001",     "group_key": "device_under_test" },
+        { "field_name": "DATE OF LAST CALIBRATION", "value_text":    "2026-03-15",          "group_key": "device_under_test" },
+        { "field_name": "Initial Reading PSI",      "value_numeric": 0.0, "unit": "PSI",    "group_key": "device_under_test" },
+        { "field_name": "Final Reading PSI",        "value_numeric": 2.4, "unit": "PSI",    "group_key": "device_under_test" }
+      ]
+    },
+
+    {
+      "id": "11110099-0000-0000-0000-000000000099",
+      "template_form_id": "fire_pump_v1",
+      "record_type": "test",
+      "status": "draft",
+      "reference_code": "FP-2026-MIKE-INCOMPLETE",
+      "scheduled_for": "2026-05-15T13:00:00Z",
+      "completed_at": null,
+      "summary": "INCOMPLETE - test case for completeness checker. Mike started a fire pump flow test, filled in churn and rated readings, then never finished the peak-flow row. Agent D's checker must flag the peak group as half-filled.",
+      "metadata": {
+        "servicetrade": {
+          "location_name": "Sample Distribution Center (anon)",
+          "job_number": "DEMO-2026-0001",
+          "job_dates": "2026-05-15",
+          "job_technicians": "Demo Inspector (Mike)"
+        },
+        "test_case": "incomplete_flow_test_row"
+      },
+      "observations": [
+        { "check_code": "pump_room_temp_ok", "description": "Pump room temperature within range", "result": "yes" },
+        { "check_code": "controller_in_auto", "description": "Controller in AUTO position", "result": "yes" }
+      ],
+      "readings": [
+        { "field_name": "churn_suction_psi",   "value_numeric": 65,  "unit": "PSI", "group_key": "flow_test_churn" },
+        { "field_name": "churn_discharge_psi", "value_numeric": 125, "unit": "PSI", "group_key": "flow_test_churn" },
+        { "field_name": "churn_rpm",           "value_numeric": 1770,"unit": "RPM", "group_key": "flow_test_churn" },
+        { "field_name": "churn_amps",          "value_numeric": 95,  "unit": "A",   "group_key": "flow_test_churn" },
+
+        { "field_name": "rated_suction_psi",   "value_numeric": 60,  "unit": "PSI", "group_key": "flow_test_rated" },
+        { "field_name": "rated_discharge_psi", "value_numeric": 95,  "unit": "PSI", "group_key": "flow_test_rated" },
+        { "field_name": "rated_gpm",           "value_numeric": 1500,"unit": "GPM", "group_key": "flow_test_rated" },
+        { "field_name": "rated_rpm",           "value_numeric": 1770,"unit": "RPM", "group_key": "flow_test_rated" },
+        { "field_name": "rated_amps",          "value_numeric": 124, "unit": "A",   "group_key": "flow_test_rated" },
+
+        { "field_name": "peak_suction_psi",    "value_numeric": 55,  "unit": "PSI", "group_key": "flow_test_peak" },
+        { "field_name": "peak_discharge_psi",  "value_numeric": 70,  "unit": "PSI", "group_key": "flow_test_peak" }
+      ]
+    }
+  ]
+}

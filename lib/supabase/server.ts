@@ -1,41 +1,22 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/db/types";
 
 /**
- * Server-side Supabase client. Reads + writes cookies via Next.js
- * cookies() so that auth refresh tokens stay in sync between server
- * components, route handlers, and middleware.
+ * DEMO MODE — server-side Supabase client uses the service-role key,
+ * which bypasses RLS. We are no longer relying on auth.uid() to scope
+ * data; the demo identity layer (lib/demo/identity.ts) defines who the
+ * "current user" is for the purposes of audit logging and role gating.
  *
- * NOTE: in pure server components Next.js does not allow setting cookies,
- * so writes here are wrapped in try/catch. Middleware is where token
- * refresh actually persists.
+ * Do NOT import this from a client component — service-role bypasses
+ * RLS and would leak everything if exposed to the browser.
  */
 export function createSupabaseServerClient() {
-  const cookieStore = cookies();
-  return createServerClient<Database>(
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+  }
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options });
-          } catch {
-            // server components can't set cookies; middleware handles refresh.
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: "", ...options });
-          } catch {
-            // see above
-          }
-        },
-      },
-    },
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    { auth: { persistSession: false, autoRefreshToken: false } },
   );
 }

@@ -34,6 +34,7 @@ export async function createSiteAction(_prev: unknown, form: FormData): Promise<
       occupancy_type: asOptional(form, "occupancy_type"),
       square_footage: asInt(form, "square_footage"),
       ahj: asOptional(form, "ahj"),
+      jurisdiction_id: asOptional(form, "jurisdiction_id"),
       notes: asOptional(form, "notes"),
     })
     .select("id")
@@ -66,6 +67,7 @@ export async function updateSiteAction(id: string, _prev: unknown, form: FormDat
       occupancy_type: asOptional(form, "occupancy_type"),
       square_footage: asInt(form, "square_footage"),
       ahj: asOptional(form, "ahj"),
+      jurisdiction_id: asOptional(form, "jurisdiction_id"),
       notes: asOptional(form, "notes"),
     })
     .eq("id", id)

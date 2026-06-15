@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils/cn";
 import type { LucideIcon } from "lucide-react";
 
+// A more confident metric card: large tabular numeral, micro-label, optional hint,
+// optional trailing dot to indicate severity (no chunky icon boxes).
 export function MetricCard({
   title,
   value,
@@ -11,28 +12,40 @@ export function MetricCard({
 }: {
   title: string;
   value: number | string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   hint?: string;
   tone?: "default" | "warning" | "destructive" | "success";
 }) {
-  const toneClass = {
-    default: "bg-primary/10 text-primary",
-    warning: "bg-warning/15 text-warning",
-    destructive: "bg-destructive/10 text-destructive",
-    success: "bg-success/15 text-success",
-  }[tone];
+  const accent =
+    tone === "destructive"
+      ? "bg-destructive"
+      : tone === "warning"
+        ? "bg-warning"
+        : tone === "success"
+          ? "bg-success"
+          : "bg-foreground/40";
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <span className={cn("grid h-8 w-8 place-items-center rounded-md", toneClass)}>
-          <Icon className="h-4 w-4" />
-        </span>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-semibold tracking-tight">{value}</div>
-        {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
-      </CardContent>
-    </Card>
+    <div className="group relative flex flex-col justify-between gap-3 rounded-md border bg-card p-4 transition-colors hover:bg-muted/30">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className={cn("h-1 w-1 rounded-full", accent)} />
+            {title}
+          </div>
+        </div>
+        {Icon ? <Icon className="h-3.5 w-3.5 text-muted-foreground/60" /> : null}
+      </div>
+      <div className="flex items-end justify-between gap-3">
+        <div className="text-[32px] font-semibold leading-none tracking-tight tabular-nums">
+          {value}
+        </div>
+        {hint ? (
+          <div className="pb-1 text-right text-[11px] leading-snug text-muted-foreground">
+            {hint}
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }

@@ -94,9 +94,38 @@ export interface Site {
   occupancy_type: string | null;
   square_footage: number | null;
   ahj: string | null;
+  jurisdiction_id: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export type JurisdictionType = "state" | "county" | "city" | "federal";
+
+export interface Jurisdiction {
+  id: string;
+  name: string;
+  jurisdiction_type: JurisdictionType;
+  state: string;
+  county: string | null;
+  city: string | null;
+  parent_id: string | null;
+  nfpa_editions: Record<string, string>;
+  adopted_code: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CodeAmendment {
+  id: string;
+  jurisdiction_id: string;
+  source_ref: string;
+  local_ref: string | null;
+  frequency_override: string | null;
+  description: string | null;
+  notes: string | null;
+  created_at: string;
 }
 
 export interface Asset {
@@ -135,6 +164,10 @@ export interface WorkRecord {
   final_report: string | null;
   latest_ai_draft_id: string | null;
   final_report_version: number;
+  // Added in migration 0005: links a work record to the inspection_templates
+  // row whose schema_json drives form rendering, validation, and printing.
+  // Nullable for backwards-compat with existing records.
+  template_form_id: string | null;
   metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
@@ -255,6 +288,99 @@ export interface AiGeneration {
   created_at: string;
 }
 
+// ----- Inspection form schema (migration 0005) -----
+
+/**
+ * Row from inspection_templates. One row per form_id (backflow_v1, riser_v1,
+ * fire_pump_v1, fire_hydrant_v1, annual_inspection_v1, annual_inspection_legacy,
+ * annual_inspection_alt5, combined_customer_v1). The full /schema/*.json blob
+ * lives in schema_json so consumers don't have to re-fetch it from disk.
+ */
+export interface InspectionTemplate {
+  id: string;
+  form_id: string;
+  form_name: string;
+  nfpa_standard: string | null;
+  rtf_form_version: string | null;
+  page_count: number;
+  schema_json: InspectionFormSchema;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Shape of a single /schema/*.json file (Agent A output, per
+ * schema/_contract.md). Stored verbatim inside
+ * InspectionTemplate.schema_json.
+ */
+export interface InspectionFormSchema {
+  form_id: string;
+  form_name: string;
+  nfpa_standard: string | null;
+  rtf_form_version: string | null;
+  page_count: number;
+  source_pdf: string;
+  powerpoint_source: boolean;
+  fields: InspectionFormField[];
+  // Only present on combined_customer_v1, which is a deliverable wrapper
+  // rather than a fillable form. Each section names which form_id
+  // contributes its page(s).
+  sections?: Array<{ kind: string; title: string; from_form_id: string | null }>;
+}
+
+/**
+ * A single field in an inspection form schema. Categories drive the
+ * data-model mapping (see schema/_contract.md "Data Model Mapping for
+ * Agent B"): observation → work_record_observations, reading →
+ * work_record_readings, asset → assets, header/signature →
+ * work_records.metadata.
+ */
+export interface InspectionFormField {
+  name: string;
+  label: string;
+  data_type:
+    | "text"
+    | "long_text"
+    | "date"
+    | "number"
+    | "boolean"
+    | "triplet"
+    | "enum"
+    | "signature"
+    | "photo";
+  category: "header" | "asset" | "observation" | "reading" | "checkbox" | "signature";
+  required: boolean;
+  page: number;
+  servicetrade_field: boolean;
+  nfpa_reference: string | null;
+  options: string[] | null;
+  group: string | null;
+  asset_role: string | null;
+  derived_from: string[] | null;
+  notes: string | null;
+}
+
+/**
+ * A numeric measurement captured during an inspection (PSI, GPM, RPM,
+ * degrees F, etc.). Kept separate from work_record_observations because
+ * readings need structured numeric storage and can be sorted, ranged,
+ * and rendered as time series later.
+ */
+export interface WorkRecordReading {
+  id: string;
+  org_id: string;
+  work_record_id: string;
+  asset_id: string | null;
+  field_name: string;
+  group_key: string | null;
+  value_numeric: number | null;
+  value_text: string | null;
+  unit: string | null;
+  taken_at: string | null;
+  created_at: string;
+}
+
 // ----- Database shape for typed supabase-js client -----
 
 // Row is strongly typed for reads (we get typed query results).
@@ -286,6 +412,10 @@ export interface Database {
       site_contacts: Row<SiteContact>;
       report_versions: Row<ReportVersion>;
       ai_generations: Row<AiGeneration>;
+      jurisdictions: Row<Jurisdiction>;
+      code_amendments: Row<CodeAmendment>;
+      inspection_templates: Row<InspectionTemplate>;
+      work_record_readings: Row<WorkRecordReading>;
     };
     Enums: {
       user_role: UserRole;

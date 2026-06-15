@@ -7,10 +7,43 @@ import {
   listObservations,
   listReportVersions,
 } from "@/lib/db/queries";
+// NOTE: The next four imports are added by Agent B's data-model PR:
+//   - getInspectionTemplateByFormId / getInspectionTemplateForRecord — template lookup
+//   - listWorkRecordReadings — readings table query
+//   - listAssetsForWorkRecord — assets scoped to the work record
+// If those aren't yet on `lib/db/queries`, the dispatch path is gated on the
+// template lookup returning null, so the existing generic layout still renders.
+import {
+  getInspectionTemplateForRecord,
+  listWorkRecordReadings,
+  listAssetsForWorkRecord,
+} from "@/lib/db/queries";
 import { formatDate, titleCase } from "@/lib/utils/format";
 import { PrintButton } from "./print-button";
 
+import { AnnualInspectionForm } from "./_forms/annual-inspection";
+import { AnnualInspectionAlt5Form } from "./_forms/annual-inspection-alt5";
+import { AnnualInspectionLegacyForm } from "./_forms/annual-inspection-legacy";
+import { BackflowForm } from "./_forms/backflow";
+import { FireHydrantForm } from "./_forms/fire-hydrant";
+import { FirePumpForm } from "./_forms/fire-pump";
+import { RiserForm } from "./_forms/riser";
+import type { FormProps } from "./_forms/types";
+
 export const dynamic = "force-dynamic";
+
+// Map a schema form_id to the per-form React component. The combined report
+// (combined_customer_v1) is a wrapper that takes multiple per-form data sets;
+// it's not dispatched from a single work record, so it isn't in this map.
+const FORM_COMPONENTS: Record<string, (props: FormProps) => JSX.Element> = {
+  annual_inspection_v1: AnnualInspectionForm,
+  annual_inspection_legacy: AnnualInspectionLegacyForm,
+  annual_inspection_alt5: AnnualInspectionAlt5Form,
+  riser_v1: RiserForm,
+  fire_pump_v1: FirePumpForm,
+  fire_hydrant_v1: FireHydrantForm,
+  backflow_v1: BackflowForm,
+};
 
 export default async function PrintableReportPage({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
@@ -21,10 +54,60 @@ export default async function PrintableReportPage({ params }: { params: { id: st
   const record = await getWorkRecord(active.org.id, params.id);
   if (!record) notFound();
 
+  // Always fetch observations + versions for both the templated path and the
+  // generic fallback.
   const [observations, versions] = await Promise.all([
     listObservations(record.id),
     listReportVersions(record.id),
   ]);
+
+  // Best-effort: try to resolve a form template + readings + assets. If any of
+  // these calls fail (e.g., Agent B's migrations haven't landed in this env),
+  // we silently fall back to the generic layout.
+  let template: Awaited<ReturnType<typeof getInspectionTemplateForRecord>> | null = null;
+  let readings: Awaited<ReturnType<typeof listWorkRecordReadings>> = [];
+  let assets: Awaited<ReturnType<typeof listAssetsForWorkRecord>> = [];
+  try {
+    template = await getInspectionTemplateForRecord(record);
+    if (template) {
+      [readings, assets] = await Promise.all([
+        listWorkRecordReadings(record.id),
+        listAssetsForWorkRecord(active.org.id, record.id),
+      ]);
+    }
+  } catch {
+    template = null;
+  }
+
+  const Renderer = template ? FORM_COMPONENTS[template.form_id] : undefined;
+
+  if (template && Renderer) {
+    return (
+      <article className="space-y-6">
+        <header className="flex items-start justify-between border-b border-slate-300 pb-4 print:hidden">
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <Flame className="h-4 w-4" />
+            Fire Protection Compliance Copilot
+          </div>
+          <PrintButton />
+        </header>
+
+        <Renderer
+          schema={template.schema_json}
+          workRecord={record}
+          observations={observations}
+          readings={readings}
+          assets={assets}
+        />
+
+        <footer className="mt-8 border-t border-slate-300 pt-3 text-[10px] text-slate-500 print:fixed print:bottom-4 print:left-0 print:right-0 print:px-8">
+          Generated from Fire Protection Compliance Copilot · {record.reference_code ?? record.id}
+        </footer>
+      </article>
+    );
+  }
+
+  // ----- Fallback: existing generic layout -----
 
   const md = (record.metadata ?? {}) as Record<string, unknown>;
   const finalized = versions.find((v) => v.kind === "finalized");
