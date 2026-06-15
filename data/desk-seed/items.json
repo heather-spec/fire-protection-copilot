@@ -1,0 +1,35 @@
+[
+  {
+    "id": "molson-coors-monthly",
+    "customer": "Molson Coors — Trenton",
+    "site": "115 Enterprise Dr",
+    "jobNumber": "48737189",
+    "inspectionType": "Monthly Pump Report",
+    "formName": "Monthly Fire Pump Report",
+    "showpiecePdf": "showpiece_mpr.pdf",
+    "sourcePdfs": ["showpiece_mpr.pdf"],
+    "requiredFields": ["Suction Pressure", "Discharge Pressure", "Pump Started By", "Run Time (min)", "Packing Adjusted"]
+  },
+  {
+    "id": "wayfair-riser",
+    "customer": "Wayfair — Donaldson",
+    "site": "1600 Donaldson Rd",
+    "jobNumber": "36396439",
+    "inspectionType": "Riser + Backflow",
+    "formName": "Annual Riser Report",
+    "showpiecePdf": "riser_report.pdf",
+    "sourcePdfs": ["riser_report.pdf", "backflow_report.pdf"],
+    "requiredFields": ["Static Pressure", "Residual Pressure", "Main Drain Test", "Inspector Signature"]
+  },
+  {
+    "id": "sharon-backflow",
+    "customer": "Sharon Road Plaza",
+    "site": "242 W Sharon Rd",
+    "jobNumber": "36410949",
+    "inspectionType": "Backflow",
+    "formName": "Backflow Device Test Report",
+    "showpiecePdf": "backflow_report.pdf",
+    "sourcePdfs": ["backflow_report.pdf"],
+    "requiredFields": ["Initial Reading PSI", "Final Reading PSI", "Test Gauge Type", "Inspector Cert No"]
+  }
+]
