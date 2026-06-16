@@ -6,8 +6,19 @@ import { DeskActionButton } from "@/components/desk/desk-actions";
 import { DestinationsPanel } from "@/components/desk/destinations-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FileText } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+const SOURCE_LABELS: Record<string, string> = {
+  "showpiece_mpr.pdf": "Monthly Pump Report",
+  "riser_report.pdf": "Riser Report",
+  "backflow_report.pdf": "Backflow Report",
+};
+
+function sourceLabel(file: string): string {
+  return SOURCE_LABELS[file] ?? file.replace(/\.pdf$/i, "").replace(/[_-]+/g, " ");
+}
 
 export default function DeskItemPage({ params }: { params: { id: string } }) {
   const item = getDeskItem(params.id);
@@ -49,7 +60,27 @@ export default function DeskItemPage({ params }: { params: { id: string } }) {
               </a>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Not combined yet.</p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {item.sourcePdfs.length} system report{item.sourcePdfs.length === 1 ? "" : "s"} to
+                combine into one customer packet:
+              </p>
+              <ul className="space-y-1">
+                {item.sourcePdfs.map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <a
+                      className="underline"
+                      href={`/desk-src/${f}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {sourceLabel(f)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </CardContent>
       </Card>
