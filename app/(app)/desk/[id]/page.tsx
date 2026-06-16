@@ -14,6 +14,9 @@ const SOURCE_LABELS: Record<string, string> = {
   "showpiece_mpr.pdf": "Monthly Pump Report",
   "riser_report.pdf": "Riser Report",
   "backflow_report.pdf": "Backflow Report",
+  "fire_alarm_report.pdf": "Fire Alarm Report",
+  "hydrant_report.pdf": "Fire Hydrant Report",
+  "inspection_report.pdf": "Annual Inspection Report",
 };
 
 function sourceLabel(file: string): string {
