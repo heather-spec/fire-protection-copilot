@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { combineItem, runCheck, bounceBack, fileItem } from "@/lib/actions/desk";
 
@@ -25,12 +26,18 @@ export function DeskActionButton({
   disabled?: boolean;
 }) {
   const [pending, start] = useTransition();
+  const router = useRouter();
   const fns = { combine: combineItem, check: runCheck, bounce: bounceBack, file: fileItem };
   return (
     <Button
       variant={variant}
       disabled={disabled || pending}
-      onClick={() => start(() => fns[action](id))}
+      onClick={() =>
+        start(async () => {
+          await fns[action](id);
+          router.refresh(); // re-fetch the server component so the result shows
+        })
+      }
     >
       {pending ? "Working…" : LABELS[action]}
     </Button>
