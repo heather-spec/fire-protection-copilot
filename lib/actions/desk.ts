@@ -54,7 +54,11 @@ export async function runCheck(id: string): Promise<void> {
       formName: item.formName,
       requiredFields: item.requiredFields,
     });
-    updateDeskState(id, { completeness, error: null });
+    // Once a combined packet has been checked, advance it to the File lane
+    // (where it is either filed or bounced back). Checking before combining
+    // leaves the item where it is.
+    const nextStage = item.state.combinedPacketUrl ? "file" : item.state.stage;
+    updateDeskState(id, { completeness, stage: nextStage, error: null });
   } catch (e) {
     updateDeskState(id, { error: `Check failed: ${(e as Error).message}` });
   }
